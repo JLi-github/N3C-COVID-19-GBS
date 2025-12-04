@@ -1,0 +1,91 @@
+sensitivity_test <- function() {
+  library(forestplot)
+
+  # Define the columns
+  labels <- c(
+              "30 Days follow up period", 
+              "60 Days follow up period", 
+              "90 Days follow up period"
+             )
+
+# Univariate Confidence Interval (NA replaced with "")
+col3 <- c("0.41(0.23–0.75)", '0.56 (0.34-0.93)', "0.66 (0.42-1.04)")
+
+# Hazard Ratios for plotting (keep NA for numeric plotting vectors
+colp <- c( "0.0039", "0.0244", "0.0743")
+
+# Separate vectors
+cola <- c( 0.41, 0.56, 0.66)
+colb <- c(0.23, 0.34, .42)
+colc <- c( 0.75, 0.93, 1.04)
+
+# Create table text
+  tabletext <- cbind(
+    c("Outcome ", labels),
+    c("HR and 95% CI", col3),
+    c("P value", colp)
+  )
+# Get dimensions
+n_rows <- nrow(tabletext)
+n_cols <- ncol(tabletext)
+
+# Style: bold entire first row (headers), normal elsewhere
+label_gp_list <- vector("list", length = n_rows)
+for (i in 1:n_rows) {
+  row_styles <- vector("list", length = n_cols)
+  for (j in 1:n_cols) {
+    if (i == 1) {
+      row_styles[[j]] <- gpar(fontface = "bold", cex = 2)  # Bold header
+    } else {
+      row_styles[[j]] <- gpar(cex = 1.8)  # Normal rows
+    }
+  }
+  label_gp_list[[i]] <- row_styles
+}
+
+# Forest plot
+plot <- forestplot(
+  labeltext = tabletext,
+  mean = c(NA, cola),
+  lower = c(NA, colb),
+  upper = c(NA, colc),
+  graph.pos = 4,
+  xlab = "Hazard Ratio",
+  xticks = c(0,0.5, 1,1.5, 2), # custom tick marks
+  new_page = TRUE,
+  # clip = c(0.1, 2),             # x-axis limits
+  xlog = FALSE,                   # log-scale for HR
+  zero = 1,                       # reference line at HR = 1
+  
+  boxsize = 0.1,
+  colgap = unit(15, 'mm'),
+  col = fpColors(box = "blue", lines = "blue", zero = "gray50"),
+  lwd.zero = 1,
+  lty.zero = "dashed",
+  graphwidth = unit(0.2, "npc"),
+  
+  txt_gp = fpTxtGp(
+    label = label_gp_list,         # Your per-cell bold header & normal body
+    ticks = gpar(cex = 1.8, fontface = "plain"),  # Larger but NOT bold ticks
+    xlab  = gpar(cex = 1.8, fontface = "plain"),  # Larger but NOT bold x-axis label
+    cex   = 1.8                    # Base size for other texts
+  ),
+
+  ci.vertices = TRUE,
+  fn.ci_norm = "fpDrawDiamondCI",
+  ci.vertices.height = 0.05,
+  lwd.ci = 1,
+  box = gpar(lty = 2, col = "royalblue"),
+
+  hrzl_lines = list(
+    "1" = gpar(lty = 1, lwd = 2),                  # Line below header
+    "2" = gpar(lty = 2),
+    "5" = gpar(lwd = 2, lty = 1, columns = c(1:3))
+  )
+)
+
+# Print plot
+print(plot)
+return(NULL)
+  
+}
