@@ -1,0 +1,125 @@
+HR_V <- function() {
+
+  library(forestplot)
+
+ # Define the columns
+  labels <- c("  GROUP",
+              "    Well Child Well Care Visits", 
+              "    Vaccination", 
+              "  AGE", 
+              "    Age < 30",  
+              "    Age 30-49", 
+              "    Age 50-64", 
+              "    Age 65-90", 
+              "  SEX", 
+              "    Female", 
+              "    Male",
+              "    Uknown", 
+              "  RACE", 
+              "    White", 
+              "    Asian", 
+              "    Black", 
+              "    Uknown", 
+              "    Other", 
+              "  Ethnicity", 
+              "    Hispanic or Latino", 
+              "    No Hispanic or Latino", 
+              "    Uknown",  
+              "  TOTAL VISITS", 
+              "    Visits >= 60", 
+              "    Visits 1-10",
+              "    Visits 11-30",
+              "    Visits 31-60", 
+              "    No_Visits", 
+              "  COMORBIDITIES", 
+              "    AKI", 
+              "    Hypertension", 
+              "    Diabetes_mellitus", 
+              "    Heart_failure", 
+              "    Cardiovascular_disease", 
+              "    Obesity", 
+              "    Hypothyroidism", 
+              "    Asthma", 
+              "    COPD", 
+              "    Hyperlipidemia", 
+              "    Stroke", 
+              "    Cancer", 
+              "    Neurological_disorder", 
+              "    Autoimmune_disease")
+
+# Univariate Confidence Interval (NA replaced with "")
+col3 <- c("","reference","0.41(0.23–0.75)","","reference","1.25(0.45–3.48)","1.71(0.63–4.67)","1.80(0.65–4.95)","","reference","2.38(1.44–3.94)","2.27(0.39–13.21)","","reference","1.06(0.33–3.42)","0.44(0.17–1.11)","0.60(0.20–1.78)","0.78(0.19–3.28)","","reference","1.51(0.52–4.36)","1.92(0.48–7.69)","","reference","2.03(0.74–5.56)","1.86(0.71–4.85)","2.25(0.86–5.83)", "1.74(0.53–5.72)","","0.84(0.24–2.97)","1.52(0.81–2.85)","0.87(0.41–1.85)","1.32(0.44–3.98)","0.83(0.39–1.79)","0.84(0.36–1.92)","1.40(0.64–3.05)","0.86(0.31–2.42)","1.28(0.49–3.38)","0.47(0.24–0.92)","3.50(1.47–8.31)","1.55(0.80–3.01)","2.35(1.29–4.30)","2.22(1.04–4.74)")
+
+# Hazard Ratios for plotting (keep NA for numeric plotting vectors
+colp <- c('','', "0.0039",'','', "0.6712", "0.2932", "0.2546",  '','',"0.0007","0.3604", '','',"0.9199", "0.0816", "0.3594", "0.7365", '','',"0.4486", "0.3587", "", "","0.1703", "0.2035", "0.0967", "0.3639","", "0.7911", "0.1976", "0.721", "0.627",  "0.6378", "0.6746", "0.4026", "0.7812", "0.6154", "0.0268", "0.0046", "0.1927", "0.0054", "0.0393")
+
+# Separate vectors
+cola <- c(NA,NA, 0.41, NA,NA,1.25, 1.72, 1.81, NA,NA,2.38, 2.28,NA,NA,  1.07,0.44, 0.6, 0.78,  NA,NA,1.51, 1.92, NA,NA,2.03, 1.86, 2.25, 1.74, NA, 0.84, 1.52, 0.87, 1.32, 0.83, 0.84, 1.4, 0.87, 1.29, 0.47, 3.5, 1.55, 2.35, 2.22)
+colb <- c(NA,NA, 0.23, NA,NA,0.45, 0.63, 0.65, NA,NA,1.44,0.39,  NA,NA,0.33,0.17, 0.2, 0.19, NA,NA,0.52, 0.48, NA,NA,0.74, 0.71, 0.86, 0.53, NA,0.24, 0.81, 0.41, 0.44, 0.39, 0.36, 0.64, 0.31, 0.49, 0.24, 1.47, 0.8, 1.29, 1.04)
+colc <- c(NA,NA, 0.75, NA,NA,3.48, 4.67, 4.95, NA,NA,3.94,13.21, NA,NA,3.42, 1.11, 1.78, 3.28, NA,NA, 4.36, 7.69, NA,NA,5.56, 4.85, 5.83, 5.72, NA,2.97, 2.85, 1.85, 3.98, 1.79, 1.92, 3.05, 2.42, 3.38, 0.92, 8.31, 3.01, 4.3, 4.74)
+
+
+tabletext <- cbind(
+    c("", labels),
+    c("HR and 95% CI", col3),
+    c("P value", colp)
+  )
+
+n_rows <- nrow(tabletext) 
+n_cols <- ncol(tabletext)
+
+label_gp_list <- vector("list", length = n_rows)
+ for (i in 1:n_rows) {
+   row_styles <- vector("list", length = n_cols)
+   for (j in 1:n_cols) {
+    if (i == 1) {
+    row_styles[[j]] <- gpar(fontface = "plain")  # Only header row bold, normal size
+    } else {
+      row_styles[[j]] <- gpar()  # Default (normal font, default size)
+    }
+  }
+  label_gp_list[[i]] <- row_styles
+}
+
+plot <- forestplot(
+  labeltext = tabletext,
+  mean = c(NA, cola),
+  lower = c(NA, colb),
+  upper = c(NA, colc),
+  graph.pos = 4,
+  xlab = "Hazard Ratio",
+  new_page = TRUE,
+  xlog = TRUE,
+  zero = 1,
+  boxsize = 0.4,
+  colgap = unit(8, 'mm'),
+  col = fpColors(box = "darkblue", lines = "darkblue", zero = "gray50"),
+  lwd.zero = 1,
+  lty.zero = "dashed",
+  graphwidth = unit(.2, "npc"),
+
+  txt_gp = fpTxtGp(
+    label = label_gp_list,      # Bold header only, others normal size
+    ticks = gpar(cex = 1, fontface = "plain"),      # Normal axis tick size
+    xlab = gpar(cex = 1, fontface = "plain"),       # Normal x-axis label size
+    cex = 1                     # Default general size
+  ),
+
+  ci.vertices = TRUE,
+  fn.ci_norm = "fpDrawDiamondCI",
+  ci.vertices.height = 0.05,
+  lwd.ci = 1,
+  box = gpar(lty = 2, col = "royalblue"),
+
+  hrzl_lines = list(
+    "1" = gpar(lty = 1, lwd = 2),
+    "2" = gpar(lty = 2),
+    "45" = gpar(lwd = 2, lty = 1, columns = c(1:3))
+  )
+)
+
+# Print plot
+print(plot)
+return(NULL)
+
+}
