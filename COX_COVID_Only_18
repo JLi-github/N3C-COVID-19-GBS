@@ -1,0 +1,46 @@
+COX_CD18 <- function(Demo_gbs_cdonly18cox) {
+
+library(survival)
+library(survminer)
+
+#  
+Demo_gbs_cdonly18cox$group_id <- as.factor(Demo_gbs_cdonly18cox$group_id)
+Demo_gbs_cdonly18cox$group_id <- factor(Demo_gbs_cdonly18cox$group_id, labels = c('Vaccination', 'NC'))
+Demo_gbs_cdonly18cox$group_id <- relevel(Demo_gbs_cdonly18cox$group_id, ref = "NC")
+
+#  
+Demo_gbs_cdonly18cox$Race <- as.factor(Demo_gbs_cdonly18cox$Race)
+Demo_gbs_cdonly18cox$Race <- relevel(Demo_gbs_cdonly18cox$Race, ref = "White")
+
+#  
+Demo_gbs_cdonly18cox$Gender <- factor(Demo_gbs_cdonly18cox$Gender, labels = c('female', 'male', 'unknown'))
+
+#  
+AKI.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + Age1 + Gender + Race + Ethnicity + Total_Visits + AKIHistory + Hypertension + Diabetes_mellitus + Heart_failure + Cardiovascular_disease + Obesity + Hypothyroidism + Asthma+  COPD + Hyperlipidemia + Stroke + Cancer + Neurological_disorder + Autoimmune_disease, data = Demo_gbs_cdonly18cox)
+
+# Create the forest plot with custom axis handling
+coxplot <- ggforest(
+    AKI.cox,
+    data = Demo_gbs_cdonly18cox,
+    fontsize = 1,
+    noDigits = 2,
+    main = "Hazard Ratios of Demographic and Comorbidity Factors"
+  )  
+
+# Print the plot
+print(coxplot)
+
+#  
+mul_cox <- summary(AKI.cox)
+mul_HR<- round(c(mul_cox$coefficients[,2]),2) 
+mul_Pvalue<- round(mul_cox$coefficients[,5],4) 
+mul_CI5<-round(mul_cox$conf.int[,3],2)
+mul_CI95<-round(mul_cox$conf.int[,4],2)
+mul_CI<-paste0(mul_HR,' (',mul_CI5,'-',mul_CI95,')')
+Variable<-row.names(data.frame(mul_cox$coefficients))
+mulcox_res<- data.frame(Variable,mul_HR,mul_CI5,mul_CI95,mul_CI,mul_Pvalue)
+colnames(mulcox_res)=c("Variable","aHR","CI5","CI95","95_CI","Pvalue")
+
+return(mulcox_res)
+
+}
