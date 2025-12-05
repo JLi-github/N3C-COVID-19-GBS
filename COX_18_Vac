@@ -1,0 +1,39 @@
+COX_18_V <- function(demo_gbs_1813){
+  
+  library(survival)
+  library(survminer)
+  
+# Convert columns to factors and relevel where necessary
+
+demo_gbs_1813$group_id <- as.factor(demo_gbs_1813$group_id)
+
+demo_gbs_1813$group_id <- factor(demo_gbs_1813$group_id, labels = c('Infection', 'NC'))
+
+demo_gbs_1813$group_id <- relevel(demo_gbs_1813$group_id, ref = "NC")
+  
+demo_gbs_1813$Race <- as.factor(demo_gbs_1813$Race)
+
+demo_gbs_1813$Race <- relevel(demo_gbs_1813$Race, ref = "White")
+
+demo_gbs_1813$Ethnicity <- as.factor(demo_gbs_1813$Ethnicity)
+  
+demo_gbs_1813$Gender <- factor(demo_gbs_1813$Gender, labels = c('female', 'male', 'unknown'))
+
+summary(demo_gbs_1813)
+  
+# Fit Cox model
+AKI.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + age1 + Gender + Race + Ethnicity + Total_Visits + AKIHistory + Hypertension + Diabetes_mellitus + Heart_failure + Cardiovascular_disease + Obesity + Hypothyroidism + Asthma + COPD + Hyperlipidemia + Stroke + Cancer + Neurological_disorder + Autoimmune_disease, data = demo_gbs_1813)  
+  
+  # Create the forest plot with custom axis handling
+  coxplot <- ggforest(
+    AKI.cox,
+    data = demo_gbs_1813,
+    fontsize = 1,
+    noDigits = 2,
+    main = "Hazard Ratios of Demographic and Comorbidity Factors"
+  )  
+
+  # Print the plot
+  print(coxplot)
+  
+}
