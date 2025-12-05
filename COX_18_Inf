@@ -1,0 +1,56 @@
+COX_18_I <- function(demo_gbs_18_23){
+  
+  library(survival)
+  library(survminer)
+  
+# Convert columns to factors and relevel where necessary
+
+demo_gbs_18_23$group_id <- as.factor(demo_gbs_18_23$group_id)
+
+demo_gbs_18_23$group_id <- factor(demo_gbs_18_23$group_id, labels = c('Infection', 'NC'))
+
+demo_gbs_18_23$group_id <- relevel(demo_gbs_18_23$group_id, ref = "NC")
+  
+demo_gbs_18_23$Race <- as.factor(demo_gbs_18_23$Race)
+
+demo_gbs_18_23$Race <- relevel(demo_gbs_18_23$Race, ref = "White")
+
+demo_gbs_18_23$Ethnicity <- as.factor(demo_gbs_18_23$Ethnicity)
+  
+demo_gbs_18_23$Gender <- factor(demo_gbs_18_23$Gender, labels = c('female', 'male', 'unknown'))
+
+# summary(demo_gbs_18_23)
+  
+# Fit Cox model
+GBS.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + age1 + Gender + Race + Ethnicity + Total_Visits + AKIHistory + Hypertension + Diabetes_mellitus + Heart_failure + Cardiovascular_disease + Obesity + Hypothyroidism + Asthma + COPD + Hyperlipidemia + Stroke + Cancer + Neurological_disorder + Autoimmune_disease, data = demo_gbs_18_23)
+  
+# Create the forest plot with custom axis handling
+  coxplot <- ggforest(
+    GBS.cox,
+    data = demo_gbs_18_23,
+    fontsize = 1,
+    noDigits = 2,
+    main = "Hazard Ratios of Demographic and Comorbidity Factors"
+  )  
+
+  # Print the plot
+  print(coxplot)
+
+  #提取函数
+mul_cox <- summary(GBS.cox)
+mul_HR<-mul_cox$coefficients[,2] 
+mul_Pvalue<- mul_cox$coefficients[,5] 
+mul_CI5<-round(mul_cox$conf.int[,3],2)
+mul_CI95<-round(mul_cox$conf.int[,4],2)
+mul_CI<-paste0(mul_HR,' (',mul_CI5,'-',mul_CI95,')')
+Variable<-row.names(data.frame(mul_cox$coefficients))
+mulcox_res<- data.frame(Variable,mul_HR,mul_CI5,mul_CI95,mul_CI,mul_Pvalue)
+colnames(mulcox_res)=c("Variable","HR","CI5","CI95","HR (95% CI)","Pvalue")
+
+# 将摘要统计信息转换为数据框
+# summary_df <- as.data.frame(summary(AKI.cox))
+
+# 查看转换后的数据框
+return(mulcox_res)
+  
+}
