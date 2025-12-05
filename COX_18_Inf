@@ -36,7 +36,7 @@ GBS.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + age1 + Gender + Race + E
   # Print the plot
   print(coxplot)
 
-  #提取函数
+  # 
 mul_cox <- summary(GBS.cox)
 mul_HR<-mul_cox$coefficients[,2] 
 mul_Pvalue<- mul_cox$coefficients[,5] 
@@ -47,10 +47,10 @@ Variable<-row.names(data.frame(mul_cox$coefficients))
 mulcox_res<- data.frame(Variable,mul_HR,mul_CI5,mul_CI95,mul_CI,mul_Pvalue)
 colnames(mulcox_res)=c("Variable","HR","CI5","CI95","HR (95% CI)","Pvalue")
 
-# 将摘要统计信息转换为数据框
+#  
 # summary_df <- as.data.frame(summary(AKI.cox))
 
-# 查看转换后的数据框
+#  
 return(mulcox_res)
   
 }
