@@ -26,7 +26,7 @@ GBS.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + age1 + Gender + Race + E
   
   # Create the forest plot with custom axis handling
   coxplot <- ggforest(
-    AKI.cox,
+    GBS.cox,
     data = demo_gbs_1813,
     fontsize = 1,
     noDigits = 2,
