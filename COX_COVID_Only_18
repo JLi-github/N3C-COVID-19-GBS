@@ -16,11 +16,11 @@ Demo_gbs_cdonly18cox$Race <- relevel(Demo_gbs_cdonly18cox$Race, ref = "White")
 Demo_gbs_cdonly18cox$Gender <- factor(Demo_gbs_cdonly18cox$Gender, labels = c('female', 'male', 'unknown'))
 
 #  
-AKI.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + Age1 + Gender + Race + Ethnicity + Total_Visits + AKIHistory + Hypertension + Diabetes_mellitus + Heart_failure + Cardiovascular_disease + Obesity + Hypothyroidism + Asthma+  COPD + Hyperlipidemia + Stroke + Cancer + Neurological_disorder + Autoimmune_disease, data = Demo_gbs_cdonly18cox)
+GBS.cox <- coxph(Surv(GBS_interval_2, GBS) ~ group_id + Age1 + Gender + Race + Ethnicity + Total_Visits + AKIHistory + Hypertension + Diabetes_mellitus + Heart_failure + Cardiovascular_disease + Obesity + Hypothyroidism + Asthma+  COPD + Hyperlipidemia + Stroke + Cancer + Neurological_disorder + Autoimmune_disease, data = Demo_gbs_cdonly18cox)
 
 # Create the forest plot with custom axis handling
 coxplot <- ggforest(
-    AKI.cox,
+    GBS.cox,
     data = Demo_gbs_cdonly18cox,
     fontsize = 1,
     noDigits = 2,
